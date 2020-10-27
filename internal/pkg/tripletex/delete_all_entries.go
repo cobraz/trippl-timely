@@ -15,17 +15,13 @@ func (c *TripletexClient) deleteEntries(id int32) error {
 
 // DeleteAllEntries deletes all activities
 func (c *TripletexClient) DeleteAllEntries(d time.Time) error {
-	p := entry.NewTimesheetEntrySearchParams()
-	p.DateFrom = d.Format("2006-01-02")
-	p.DateTo = d.Add(time.Hour * 24).Format("2006-01-02")
-
-	res, err := c.client.Entry.TimesheetEntrySearch(p, c.authInfo)
+	res, err := c.GetAllEntries(d)
 	if err != nil {
 		return err
 	}
 
-	for _, d := range res.Payload.Values {
-		err := c.deleteActivitiy(d.ID)
+	for _, d := range res {
+		err := c.deleteEntries(d.ID)
 		if err != nil {
 			return err
 		}
