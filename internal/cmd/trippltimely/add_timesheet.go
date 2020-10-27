@@ -43,7 +43,7 @@ func AddTimesheet(c *cli.Context) error {
 	}
 
 	// TODO: Do we really need to delete stuff?
-	err = tx.DeleteAllActivities(*d)
+	err = tx.DeleteAllEntries(*d)
 	if err != nil {
 		return err
 	}
