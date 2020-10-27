@@ -28,7 +28,12 @@ func AddTimesheet(c *cli.Context) error {
 		return err
 	}
 
-	d := c.Timestamp("date")
+	var d *time.Time = c.Timestamp("date")
+
+	if d == nil {
+		now := time.Now()
+		d = &now
+	}
 
 	// List events from Timely with projects
 	// events, err := ttly.GetEventsWithProjectExternalID(client, *d)
