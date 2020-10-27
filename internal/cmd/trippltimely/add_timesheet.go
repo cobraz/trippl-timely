@@ -43,10 +43,10 @@ func AddTimesheet(c *cli.Context) error {
 	}
 
 	// TODO: Do we really need to delete stuff?
-	err = tx.DeleteAllActivities(*d)
-	if err != nil {
-		return err
-	}
+	// err = tx.DeleteAllEntries(*d)
+	// if err != nil {
+	// 	return err
+	// }
 
 	var timeentries []ttly.TimesheetEntry
 
@@ -96,7 +96,7 @@ func AddTimesheet(c *cli.Context) error {
 	}
 
 	// Step three: Set them in Tripletex
-	err = tx.UpdateTimesheet(timeentries)
+	err = tx.UpdateTimesheet(*d, timeentries)
 	if err != nil {
 		return err
 	}
