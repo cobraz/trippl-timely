@@ -1,20 +1,22 @@
 package tripletex
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
+	"time"
 
 	"github.com/bjerkio/tripletex-go/client/entry"
 	"github.com/bjerkio/tripletex-go/models"
 	"github.com/cobraz/trippl-timely/internal/pkg/trippltimely"
 )
 
-func (c *TripletexClient) UpdateTimesheet(entries []trippltimely.TimesheetEntry) error {
+func (c *TripletexClient) UpdateTimesheet(d time.Time, entries []trippltimely.TimesheetEntry) error {
 
 	var tEntries []*models.TimesheetEntry
 	// yes := true
 	emty := " "
+
+	oldEntries, err := c.GetAllEntries(d)
 
 	for _, e := range entries {
 		d := e.Date.Format("2006-01-02")
@@ -39,7 +41,7 @@ func (c *TripletexClient) UpdateTimesheet(entries []trippltimely.TimesheetEntry)
 			}
 		}
 
-		tEntries = append(tEntries, &models.TimesheetEntry{
+		cte := &models.TimesheetEntry{
 			Activity: &a,
 			Comment:  e.Note,
 			Date:     &d,
@@ -50,26 +52,37 @@ func (c *TripletexClient) UpdateTimesheet(entries []trippltimely.TimesheetEntry)
 				FirstName: &emty,
 				LastName:  &emty,
 			},
-		})
+		}
+
+		var exists bool = false
+
+		for _, te := range oldEntries {
+			if te.Project.ID == p.ID && te.Activity.ID == a.ID {
+				if *te.Locked == false {
+					err := c.UpdateEntry(te.ID, cte)
+					if err != nil {
+						return err
+					}
+				}
+
+				exists = true
+			}
+		}
+
+		if exists == false {
+			tEntries = append(tEntries, cte)
+		}
 	}
 
-	body, err := json.Marshal(tEntries)
-	fmt.Println(string(body))
+	if len(tEntries) > 0 {
+		p := entry.NewTimesheetEntryListPostListParams()
+		p.Body = tEntries
 
-	p := entry.NewTimesheetEntryListPostListParams()
-	p.Body = tEntries
-
-	_, err = c.client.Entry.TimesheetEntryListPostList(p, c.authInfo)
-	if err != nil {
-		// TODO: Add a way where we can update 👇
-		// p := entry.NewTimesheetEntryListPutListParams()
-		// p.Body = tEntries
-		// _, err = c.client.Entry.TimesheetEntryListPutList(p, c.authInfo)
-		// if err != nil {
-		// 	return err
-		// }
-		fmt.Printf("Was not able to insert. Make sure you have a clean slate at Tripletex")
-		return nil
+		_, err = c.client.Entry.TimesheetEntryListPostList(p, c.authInfo)
+		if err != nil {
+			fmt.Printf("Was not able to insert. Make sure you have a clean slate at Tripletex")
+			return nil
+		}
 	}
 
 	return nil
