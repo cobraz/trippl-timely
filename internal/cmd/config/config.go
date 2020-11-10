@@ -40,6 +40,58 @@ var tripletexQs = []*survey.Question{
 	},
 }
 
+func askAboutActivityCode(tx *tx.TripletexClient) (*int32, error) {
+	activities, err := tx.GetActivities()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var aOpts []string
+	for _, a := range activities {
+		aOpts = append(aOpts, a.Name)
+	}
+
+	prompt := &survey.Select{
+		Message: "Choose an activity to track on:",
+		Options: aOpts,
+	}
+
+	var selectedOpt int
+
+	survey.AskOne(prompt, &selectedOpt, survey.WithValidator(survey.Required))
+
+	var res *int32 = &activities[selectedOpt].ID
+
+	return res, nil
+}
+
+func askAboutEmployeeId(tx *tx.TripletexClient) (*int32, error) {
+	employees, err := tx.GetEmployees()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var aOpts []string
+	for _, a := range employees {
+		aOpts = append(aOpts, fmt.Sprintf("%s %s", *a.FirstName, *a.LastName))
+	}
+
+	prompt := &survey.Select{
+		Message: "Choose which employee you want to copy to:",
+		Options: aOpts,
+	}
+
+	var selectedOpt int
+
+	survey.AskOne(prompt, &selectedOpt, survey.WithValidator(survey.Required))
+
+	var res *int32 = &employees[selectedOpt].ID
+
+	return res, nil
+}
+
 func SetConfig(c *cli.Context) error {
 	var timley config.TimelyConfig
 
@@ -68,27 +120,21 @@ func SetConfig(c *cli.Context) error {
 		return err
 	}
 
-	activities, err := client.GetActivities()
+	actCode, err := askAboutActivityCode(client)
 
 	if err != nil {
 		return err
 	}
 
-	var aOpts []string
-	for _, a := range activities {
-		aOpts = append(aOpts, a.Name)
+	tripletex.ActivityCode = *actCode
+
+	empID, err := askAboutEmployeeId(client)
+
+	if err != nil {
+		return err
 	}
 
-	prompt := &survey.Select{
-		Message: "Choose an activity to track on:",
-		Options: aOpts,
-	}
-
-	var selectedOpt int
-
-	survey.AskOne(prompt, &selectedOpt, survey.WithValidator(survey.Required))
-
-	tripletex.ActivityCode = activities[selectedOpt].ID
+	tripletex.EmployeeId = fmt.Sprint(*empID)
 
 	cnf := config.Config{
 		Timely:    timley,
