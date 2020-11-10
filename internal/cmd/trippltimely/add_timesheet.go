@@ -101,7 +101,7 @@ func AddTimesheet(c *cli.Context) error {
 	}
 
 	// Step three: Set them in Tripletex
-	err = tx.UpdateTimesheet(*d, timeentries)
+	err = tx.UpdateTimesheet(config.Tripletex.EmployeeId, *d, timeentries)
 	if err != nil {
 		return err
 	}

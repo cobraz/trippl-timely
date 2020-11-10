@@ -3,6 +3,7 @@ package tripletex
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/bjerkio/tripletex-go/client/entry"
@@ -10,13 +11,23 @@ import (
 	"github.com/cobraz/trippl-timely/internal/pkg/trippltimely"
 )
 
-func (c *TripletexClient) UpdateTimesheet(d time.Time, entries []trippltimely.TimesheetEntry) error {
+func (c *TripletexClient) UpdateTimesheet(employeeId string, d time.Time, entries []trippltimely.TimesheetEntry) error {
 
 	var tEntries []*models.TimesheetEntry
 	// yes := true
 	emty := " "
 
-	oldEntries, err := c.GetAllEntries(d)
+	oldEntries, err := c.GetAllEntries(employeeId, d)
+
+	empID, err := strconv.ParseInt(employeeId, 10, 32)
+	if err != nil {
+		return err
+	}
+	emp := models.Employee{
+		ID:        int32(empID),
+		FirstName: &emty,
+		LastName:  &emty,
+	}
 
 	for _, e := range entries {
 		d := e.Date.Format("2006-01-02")
@@ -42,16 +53,12 @@ func (c *TripletexClient) UpdateTimesheet(d time.Time, entries []trippltimely.Ti
 		}
 
 		cte := &models.TimesheetEntry{
+			Employee: &emp,
 			Activity: &a,
 			Comment:  e.Note,
 			Date:     &d,
 			Hours:    &h,
 			Project:  p,
-			Employee: &models.Employee{
-				ID:        1772944,
-				FirstName: &emty,
-				LastName:  &emty,
-			},
 		}
 
 		var exists bool = false

@@ -20,6 +20,7 @@ type TripletexConfig struct {
 	ConsumerToken string `survey:"consumer_token"`
 	EmployeeToken string `survey:"employee_token"`
 	ActivityCode  int32
+	EmployeeId    string `survey:"employee_id"`
 }
 
 type Config struct {
