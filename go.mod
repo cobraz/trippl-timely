@@ -1,6 +1,6 @@
 module github.com/cobraz/trippl-timely
 
-go 1.14
+go 1.16
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.1.1
