@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.1.2](https://www.github.com/cobraz/trippl-timely/compare/v2.1.1...v2.1.2) (2021-07-10)
+
+
+### Bug Fixes
+
+* Build issues ([de69988](https://www.github.com/cobraz/trippl-timely/commit/de6998849f8421fa647df453e5c131284b8a5909))
+
 ### [2.1.1](https://www.github.com/cobraz/trippl-timely/compare/v2.1.0...v2.1.1) (2021-07-10)
 
 
