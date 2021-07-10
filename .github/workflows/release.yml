@@ -1,25 +1,25 @@
-name: releaser
+name: Releaser
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
 
 jobs:
   releaser:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Unshallow
-        run: git fetch --prune --unshallow
-      -
-        name: Set up Go
+      - uses: actions/checkout@v2
+      - uses: GoogleCloudPlatform/release-please-action@v2
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: go
+      - name: Set up Go
+        if: ${{ steps.release.outputs.release_created }}
         uses: actions/setup-go@v2
-      -
-        name: Release
+      - name: Release
+        if: ${{ steps.release.outputs.release_created }}
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
