@@ -9,7 +9,7 @@ import (
 
 // GetEvents returns all Timely events
 func GetEvents(client *http.Client, arguments string) ([]*Event, error) {
-	url := "https://api.timelyapp.com/1.1/930822/events"
+	url := "https://api.timelyapp.com/1.1/930822/users/1960450/events"
 	if arguments != "" {
 		url = fmt.Sprintf("%s%s", url, arguments)
 	}
