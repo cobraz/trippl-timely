@@ -2,6 +2,8 @@
 
 This utility is written in Go and features functionality to copy Timely events to Tripletex, a Norwegian accounting software.
 
+This project has led to some developments of a commercial option. Bjerk has developed [refactored and deployed an integration](https://www.tripletex.no/integrasjoner/timely/) that does the same thing as this, but better.
+
 ## Install
 
 ```shell
